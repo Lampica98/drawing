@@ -5,27 +5,10 @@ import { Tldraw, createTLStore, getSnapshot, loadSnapshot } from 'tldraw'
 import 'tldraw/tldraw.css'
 import './styles.css'
 
-const STORAGE_KEY = 'drawing-tldraw-document'
 const TLDRAW_LICENSE_KEY = import.meta.env.VITE_TLDRAW_LICENSE_KEY
 const store = createTLStore()
 
-const savedSnapshot = localStorage.getItem(STORAGE_KEY)
-if (savedSnapshot) {
-  try {
-    loadSnapshot(store, JSON.parse(savedSnapshot))
-  } catch {
-    localStorage.removeItem(STORAGE_KEY)
-  }
-}
-
-function saveSnapshot() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(getSnapshot(store)))
-}
-
-store.listen(saveSnapshot, { scope: 'document' })
-
 function resetBoard() {
-  localStorage.removeItem(STORAGE_KEY)
   window.location.reload()
 }
 
@@ -68,7 +51,6 @@ function App() {
     try {
       const snapshot = JSON.parse(await file.text())
       loadSnapshot(store, snapshot)
-      saveSnapshot()
     } catch {
       window.alert('Ne mogu da ucitam ovaj fajl. Izaberi JSON export iz ove aplikacije.')
     } finally {
