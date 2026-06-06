@@ -6,6 +6,7 @@ import 'tldraw/tldraw.css'
 import './styles.css'
 
 const STORAGE_KEY = 'drawing-tldraw-document'
+const TLDRAW_LICENSE_KEY = import.meta.env.VITE_TLDRAW_LICENSE_KEY
 const store = createTLStore()
 
 const savedSnapshot = localStorage.getItem(STORAGE_KEY)
@@ -60,7 +61,7 @@ function App() {
   return (
     <main className="app">
       <section className="canvas-shell" aria-label="Drawing canvas">
-        <Tldraw store={store} />
+        <Tldraw store={store} licenseKey={TLDRAW_LICENSE_KEY} />
 
         <nav className="actions" aria-label="Drawing actions">
           <input
