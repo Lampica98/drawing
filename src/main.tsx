@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { Download, FilePlus2, Upload } from 'lucide-react'
+import { FilePlus2, Save, Upload } from 'lucide-react'
 import { Tldraw, createTLStore, getSnapshot, loadSnapshot } from 'tldraw'
 import 'tldraw/tldraw.css'
 import './styles.css'
@@ -29,14 +29,34 @@ function resetBoard() {
   window.location.reload()
 }
 
-function downloadBoard() {
+async function saveBoard() {
   const payload = JSON.stringify(getSnapshot(store), null, 2)
+  const filename = `drawing-${new Date().toISOString().slice(0, 10)}.json`
+
+  if ('showSaveFilePicker' in window) {
+    const fileHandle = await window.showSaveFilePicker({
+      suggestedName: filename,
+      startIn: 'downloads',
+      types: [
+        {
+          description: 'JSON file',
+          accept: { 'application/json': ['.json'] },
+        },
+      ],
+    })
+    const writable = await fileHandle.createWritable()
+
+    await writable.write(payload)
+    await writable.close()
+    return
+  }
+
   const blob = new Blob([payload], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
 
   link.href = url
-  link.download = `drawing-${new Date().toISOString().slice(0, 10)}.json`
+  link.download = filename
   link.click()
   URL.revokeObjectURL(url)
 }
@@ -85,9 +105,13 @@ function App() {
             <Upload size={18} aria-hidden="true" />
             <span>Import</span>
           </button>
-          <button type="button" onClick={downloadBoard} title="Download JSON">
-            <Download size={18} aria-hidden="true" />
-            <span>Download</span>
+          <button
+            type="button"
+            onClick={() => void saveBoard()}
+            title="Save JSON"
+          >
+            <Save size={18} aria-hidden="true" />
+            <span>Save</span>
           </button>
           <button type="button" onClick={resetBoard} title="New board">
             <FilePlus2 size={18} aria-hidden="true" />
